@@ -16,11 +16,15 @@ main{
     background-color: rgba(0, 0, 0, 0.5);
 }
 
-h2{
+h2 {
     background-image: linear-gradient(to right, #8916b2, #1870bd);
     -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
+}
+
+.valid{
+    background: linear-gradient(to right, #4facfe, #00f2fe);
 }
 
 .title{

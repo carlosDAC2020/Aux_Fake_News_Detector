@@ -1,11 +1,15 @@
-from django.shortcuts import render, HttpResponse
+from django.shortcuts import render, HttpResponse, redirect
 from django.db import IntegrityError
 
-#from newsapi import NewsApiClient
+
 import feedparser
 from datetime import datetime
 
 from .models import News
+import spacy
+import nltk
+from nltk.corpus import wordnet as wn
+from collections import defaultdict
 
 def index(request):
     
@@ -57,7 +61,41 @@ def news(request):
         'https://www.eltiempo.com/rss/deportes_tenis.xml',
         'https://www.eltiempo.com/rss/deportes_ciclismo.xml',
         'https://www.eltiempo.com/rss/deportes_automovilismo.xml',
-        'https://www.eltiempo.com/rss/deportes_otros-deportes.xml'
+        'https://www.eltiempo.com/rss/deportes_otros-deportes.xml',
+
+        # BBC
+            # Últimas Noticias: 
+        'http://www.bbc.co.uk/mundo/ultimas_noticias/index.xml',
+
+            # Internacional: 
+        'http://www.bbc.co.uk/mundo/temas/internacional/index.xml',
+
+            # América Latina: 
+        'http://www.bbc.co.uk/mundo/temas/america_latina/index.xml',
+
+            # Ciencia: 
+        'http://www.bbc.co.uk/mundo/temas/ciencia/index.xml',
+
+            # Salud: 
+        'http://www.bbc.co.uk/mundo/temas/salud/index.xml',
+
+            # Tecnología: 
+        'http://www.bbc.co.uk/mundo/temas/tecnologia/index.xml',
+
+            # Economía: 
+        'http://www.bbc.co.uk/mundo/temas/economia/index.xml',
+
+            # Cultura: 
+        'http://www.bbc.co.uk/mundo/temas/cultura/index.xml',
+
+            # Video: 
+        'http://www.bbc.co.uk/mundo/temas/video/index.xml',
+
+            # Fotos: 
+        'http://www.bbc.co.uk/mundo/temas/fotos/index.xml',
+
+            # Aprenda Inglés: 
+        'http://www.bbc.co.uk/mundo/temas/aprenda_ingles/index.xml'
     ]
 
     i=1
@@ -81,7 +119,50 @@ def news(request):
     
     return HttpResponse(f"recibidos {i} articulos ")
 
-    
+def valid_new(request):
+     if request.method =="POST":
+        # Carga del modelo en español
+        nlp = spacy.load("es_core_news_sm")
+
+        texto = request.POST["text"]
+        print(texto)
+        # Procesamiento del texto
+        doc = nlp(texto)
+
+        # Tokenización
+        print("Tokenización:")
+        for token in doc:
+            print(token.text)
+
+        # Análisis de entidades
+        print("\nEntidades:")
+        for entidad in doc.ents:
+            print(entidad.text, "-", entidad.label_)
+
+
+        # Extracción de palabras clave (sustantivos y adjetivos)
+        palabras_clave = [token for token in doc if token.pos_ in ['NOUN', 'ADJ']]
+
+        # Búsqueda de sinónimos
+        sinonimos = defaultdict(list)
+        for palabra in palabras_clave:
+            synsets = wn.synsets(palabra.text, lang='spa')
+            for synset in synsets:
+                for lemma in synset.lemmas(lang='spa'):
+                    sinonimo = lemma.name()
+                    if sinonimo != palabra.text and sinonimo not in sinonimos[palabra.text]:
+                        sinonimos[palabra.text].append(sinonimo)
+
+        # Resultados
+        print("Palabras clave y sinónimos:")
+        for palabra, sinonimos_palabra in sinonimos.items():
+            print(f"{palabra}: {', '.join(sinonimos_palabra)}")
+
+        
+        
+        return HttpResponse("validar noticias")
+
+
 
     
 

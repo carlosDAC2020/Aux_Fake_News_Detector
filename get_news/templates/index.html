@@ -29,12 +29,17 @@
         <section class="py-2 text-center container ">
           <div class="row align-items-md-stretch">
             <div class="col-md-6">
-              <div class="h-100 p-5 text-bg-dark rounded-3">
-                
-                  
-                      
-                    
-        
+              <div class="">
+                <form action="{% url 'get_news:valid' %}" method="post" class="h-100 p-5 text-bg-dark rounded-3">
+                  {% csrf_token %}
+                  <h2>Validate a News</h2>
+                  <div class="mb-3">
+                    <h4 for="exampleFormControlTextarea1" class="form-label">Write a news and valid if it is false or true.</h4>
+                    <textarea class="form-control " name="text" id="exampleFormControlTextarea1" rows="3" required></textarea>
+                  </div>
+                  <input type="submit" class="btn btn-primary btn-lg" value="validar">
+                </form>
+    
               </div>
             </div>
             <div class="col-md-6">
