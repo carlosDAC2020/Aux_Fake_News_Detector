@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Fake_News_Detector
 deteccion de notias falsas 
 
@@ -21,3 +22,7 @@ deteccion de notias falsas
 - Ejecutsr el proyecto :muscle: :sunglasses: 
  
         `$ py manage.py runserver`
+=======
+# FakeNewsDetector
+Fake News Detector
+>>>>>>> 7ea7d551d1b80825c4c2f6f1b4fadca9a01a9eb2
