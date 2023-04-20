@@ -8,6 +8,8 @@ from datetime import datetime
 from .models import News
 import spacy
 import nltk
+nltk.download('wordnet')
+nltk.download('omw-1.4')
 from nltk.corpus import wordnet as wn
 from collections import defaultdict
 
@@ -95,29 +97,129 @@ def news(request):
         'http://www.bbc.co.uk/mundo/temas/fotos/index.xml',
 
             # Aprenda Inglés: 
-        'http://www.bbc.co.uk/mundo/temas/aprenda_ingles/index.xml'
+        'http://www.bbc.co.uk/mundo/temas/aprenda_ingles/index.xml',
+        
+        # portafolio.co
+            # Economia
+        'http://portafolio.co/rss/economia',
+
+            # Finanzas
+        'http://portafolio.co/rss/economia/finanzas',
+        
+            # Gobierno
+        'http://portafolio.co/rss/economia/gobierno',
+        
+            # Infraestructura
+        'http://www.portafolio.co/rss/economia/infraestructura',
+        
+            # Empleo
+        'http://portafolio.co/rss/economia/empleo',
+        
+            # Impuestos
+        'http://portafolio.co/rss/economia/impuestos',
+        
+            # Negocios
+        'http://portafolio.co/rss/negocios',
+        
+            # Empresas
+        'http://portafolio.co/rss/negocios/empresas',
+        
+            # Emprendimiento
+        'http://portafolio.co/rss/negocios/emprendimiento',
+        
+            # Inversión
+        'http://portafolio.co/rss/negocios/inversion',
+        
+            # Internacional
+        'http://www.portafolio.co/rss/internacional',
+        
+            # Innovación
+        'http://portafolio.co/rss/innovacion',
+        
+            # Ahorro
+        'http://portafolio.co/rss/mis-finanzas/ahorro',
+        
+            # Vivienda
+        'http://portafolio.co/rss/mis-finanzas/vivienda',
+        
+            # Opinión
+        'http://portafolio.co/rss/opinion',
+        
+            # Editorial
+        'http://portafolio.co/rss/opinion/editorial',
+        
+            # Tendencias
+        'http://portafolio.co/rss/tendencias',
+        
+            # Entretenimiento
+        'http://portafolio.co/rss/tendencias/entretenimiento',
+        
+            # Sociales
+        'http://portafolio.co/rss/tendencias/sociales',
+        
+            # Lujo
+        'http://portafolio.co/rss/tendencias/lujo',
+        
+        # Semana
+            # Economia y Negocios
+        'https://www.dinero.com/dinero/rss/rssdinero.xml',
+        
+        # Colombia.ladevi
+            # Actualidad
+        'https://colombia.ladevi.info/rss/actualidad.xml',
+            
+            # Empresas y Productos 
+        'https://colombia.ladevi.info/rss/empresas-productos.xml',
+        
+            # Opinion
+        'https://colombia.ladevi.info/rss/opinion.xml',
+        
+            # Tendencias
+        'https://colombia.ladevi.info/rss/tendencias.xml',
+        
+            # Entrevistas
+        'https://colombia.ladevi.info/rss/entrevistas.xml',
+        
+            # Agenda
+        'https://colombia.ladevi.info/rss/agenda.xml'
+        
     ]
 
-    i=1
+    i = 0
     for url in rss_urls:
         feed = feedparser.parse(url)
         for entry in feed.entries:
+            title = entry.get('title', '')
+            description = entry.get('description', '')
+            link = entry.get('link', '')
+            date_published = entry.get('published', '')
+            image = entry.get('media_content', '') or entry.get('enclosure', '')
+            if image:
+                image = image[0].get('url', '')
             try:
-                new = News.objects.create(
-                    title = entry.title,
-                    description = entry.summary,
-                    url =entry.links[0].href,
-                    public_date = datetime.strptime(entry.published, '%a, %d %b %Y %H:%M:%S %z'),
-                    image = entry.links[1].href if len(entry.links)>1 else ""
-                )
-                new.save()
-            except IntegrityError:
+                if not (title and description and link and date_published):
+                    raise ValueError('Noticia incompleta')
+                if '-' in date_published:
+                    date_format = '%Y-%m-%dT%H:%M:%S%z'
+                else:
+                    date_format = '%a, %d %b %Y %H:%M:%S %z'
+                public_date = datetime.strptime(date_published, date_format)
+            except (ValueError, TypeError):
+                pass
+            else:
+                try:
+                    new = News.objects.create(
+                        title=title,
+                        description=description,
+                        url=link,
+                        public_date=public_date,
+                        image=image
+                    )
+                    i += 1
+                except IntegrityError:
                     pass
-           
-            i+=1
-        
-    
-    return HttpResponse(f"recibidos {i} articulos ")
+    return HttpResponse(f"Recibidos {i} artículos.")
+
 
 def valid_new(request):
      if request.method =="POST":
