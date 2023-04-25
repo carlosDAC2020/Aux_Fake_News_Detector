@@ -15,9 +15,9 @@ from collections import defaultdict
 nlp = spacy.load("es_core_news_md")
 
 def index(request):
-    
+    print(News.objects.all()[:9])
     return render(request, 'index.html', {
-        "articles": News.objects.all()
+        "articles": News.objects.all()[:9]
     })
     
 
@@ -106,6 +106,9 @@ def news(request):
         feed = feedparser.parse(url)
         for entry in feed.entries:
             try:
+                if entry.summary == "":
+                    
+                    continue
                 new = News.objects.create(
                     title = entry.title,
                     description = entry.summary,
@@ -114,7 +117,7 @@ def news(request):
                     image = entry.links[1].href if len(entry.links)>1 else ""
                 )
                 new.save()
-            except IntegrityError:
+            except IntegrityError or ValueError:
                     pass
            
             i+=1
