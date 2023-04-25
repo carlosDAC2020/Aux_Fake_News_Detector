@@ -11,6 +11,9 @@ import nltk
 from nltk.corpus import wordnet as wn
 from collections import defaultdict
 
+# modelo de procesamiento de texto 
+nlp = spacy.load("es_core_news_md")
+
 def index(request):
     
     return render(request, 'index.html', {
@@ -121,9 +124,7 @@ def news(request):
 
 def valid_new(request):
      if request.method =="POST":
-        # Carga del modelo en español
-        nlp = spacy.load("es_core_news_sm")
-
+        
         texto = request.POST["text"]
         print(texto)
         # Procesamiento del texto
