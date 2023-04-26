@@ -8,15 +8,14 @@ from datetime import datetime
 from .models import News
 import spacy
 import nltk
-nltk.download('wordnet')
-nltk.download('omw-1.4')
+
 from nltk.corpus import wordnet as wn
 from collections import defaultdict
 
 def index(request):
     
     return render(request, 'index.html', {
-        "articles": News.objects.all()
+        "articles": News.objects.all()[:19]
     })
     
 
@@ -218,6 +217,7 @@ def news(request):
                     i += 1
                 except IntegrityError:
                     pass
+
     return HttpResponse(f"Recibidos {i} artículos.")
 
 

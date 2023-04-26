@@ -52,24 +52,33 @@
           </div>
         </section>
 
-        <section class="py-2 text-center container ">
-          <div class="row align-items-md-stretch">
-            <div class="col-md-6">
-              <div class="h-100 p-5 text-bg-dark rounded-3">
-                <h2>Change the background</h2>
-                <p>Swap the background-color utility and add a `.text-*` color utility to mix up the jumbotron look. Then, mix and match with additional component themes and more.</p>
-                <button class="btn btn-outline-light" type="button">Example button</button>
+        <!-- quiero hacer una gañleria de cards que muestran un titulo y una descriocion de una noticia
+        pero para que aveces debid al contendiod delos titulod y la descripcion las cartas tiene una altura mayor que otras 
+      
+        quiero que des estilos de tal forma que no quede sobrando mucho espacio entre cards mas bien que el espacio entre erriba y abajo sea igual que a los lados (sin umportar la altura que tengan), mas o menos esto se veria como un mosaico -->
+        <div class="container px-4 py-5" id="custom-cards">
+
+          <h2 class="pb-2 ">Some News</h2>
+      
+          <div class="row row-cols-1 row-cols-lg-3 align-items-stretch g-4 py-5">
+
+            {% for new in articles %}
+
+              <div class="col">
+                <div class="card card-cover overflow-hidden text-bg-dark rounded-4 shadow-lg" style="background-image: url('unsplash-photo-1.jpg');">
+                  <div class="d-flex flex-column h-100 p-5 pb-3 text-white text-shadow-1">
+                    <h6 class="pt-5 mt-5 mb-4 display-6 lh-1 fw-bold">{{new.title}}</h6>
+                    <p>{{new.description}}</p>
+                  </div>
+                </div>
               </div>
-            </div>
-            <div class="col-md-6">
-              <div class="h-100 p-5 bg-body-tertiary border rounded-3">
-                <h2>Add borders</h2>
-                <p>Or, keep it light and add a border for some added definition to the boundaries of your content. Be sure to look under the hood at the source HTML here as we've adjusted the alignment and sizing of both column's content for equal-height.</p>
-                <button class="btn btn-outline-secondary" type="button">Example button</button>
-              </div>
-            </div>
+
+            {% endfor %}
+            
           </div>
-        </section>
+
+        </div>
+      
       
       
       </main>
