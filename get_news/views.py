@@ -8,14 +8,13 @@ from datetime import datetime
 from .models import News
 import spacy
 import nltk
-
-# modelo de procesamiento de texto 
-nlp = spacy.load('es_core_news_md')
+from nltk.corpus import wordnet as wn
+from collections import defaultdict
 
 def index(request):
-    
+    print(News.objects.all()[:9])
     return render(request, 'index.html', {
-        "articles": News.objects.all()
+        "articles": News.objects.all()[:9]
     })
     
 
@@ -104,6 +103,9 @@ def news(request):
         feed = feedparser.parse(url)
         for entry in feed.entries:
             try:
+                if entry.summary == "":
+                    
+                    continue
                 new = News.objects.create(
                     title = entry.title,
                     description = entry.summary,
@@ -112,7 +114,7 @@ def news(request):
                     image = entry.links[1].href if len(entry.links)>1 else ""
                 )
                 new.save()
-            except IntegrityError:
+            except IntegrityError or ValueError:
                     pass
            
             i+=1
@@ -122,12 +124,12 @@ def news(request):
 
 def valid_new(request):
      if request.method =="POST":
+        # Carga del modelo en español
+        nlp = spacy.load("es_core_news_sm")
 
-        texto = request.POST['text']
-        # Tokenización del texto ingresado por el usuario
-        tokens = nltk.word_tokenize(texto)
-
-        # Clasificación de las palabras usando SpaCy
+        texto = request.POST["text"]
+        print(texto)
+        # Procesamiento del texto
         doc = nlp(texto)
         for token in doc:
             print(token.text, token.pos_)
