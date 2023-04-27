@@ -6,6 +6,7 @@ import feedparser
 from datetime import datetime
 
 from .models import News
+from .functions_aux.scraping import get_description
 import spacy
 import nltk
 
@@ -15,7 +16,7 @@ from collections import defaultdict
 def index(request):
     
     return render(request, 'index.html', {
-        "articles": News.objects.all()[:19]
+        "articles": News.objects.all()[:9]
     })
     
 
@@ -224,47 +225,25 @@ def news(request):
 def valid_new(request):
      if request.method =="POST":
         # Carga del modelo en español
-        nlp = spacy.load("es_core_news_sm")
+        nlp = spacy.load("es_core_news_md")
 
-        texto = request.POST["text"]
-        print(texto)
-        # Procesamiento del texto
-        doc = nlp(texto)
+        for new in News.objects.all()[:9]:
 
-        # Tokenización
-        print("Tokenización:")
-        for token in doc:
-            print(token.text)
+            texto = new.title
+            print("\n\n ",texto)
+            # Procesamiento del texto
+            doc = nlp(texto)
 
-        # Análisis de entidades
-        print("\nEntidades:")
-        for entidad in doc.ents:
-            print(entidad.text, "-", entidad.label_)
+            # Tokenización
+            print("Tokenización:")
+            for token in doc:
+                print(token.text)
 
+            # Análisis de entidades
+            print("\nEntidades:")
+            for entidad in doc.ents:
+                print(entidad.text, "-", entidad.label_)
 
-        # Extracción de palabras clave (sustantivos y adjetivos)
-        palabras_clave = [token for token in doc if token.pos_ in ['NOUN', 'ADJ']]
-
-        # Búsqueda de sinónimos
-        sinonimos = defaultdict(list)
-        for palabra in palabras_clave:
-            synsets = wn.synsets(palabra.text, lang='spa')
-            for synset in synsets:
-                for lemma in synset.lemmas(lang='spa'):
-                    sinonimo = lemma.name()
-                    if sinonimo != palabra.text and sinonimo not in sinonimos[palabra.text]:
-                        sinonimos[palabra.text].append(sinonimo)
-
-        # Resultados
-        print("Palabras clave y sinónimos:")
-        for palabra, sinonimos_palabra in sinonimos.items():
-            print(f"{palabra}: {', '.join(sinonimos_palabra)}")
-
-        
-        
         return HttpResponse("validar noticias")
 
-
-
-    
 
