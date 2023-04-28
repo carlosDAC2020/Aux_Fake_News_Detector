@@ -53,11 +53,21 @@ jobs:
         with:
           name: python-app
           path: .
-          
-      - name: 'Deploy to Azure Web App'
-        uses: azure/webapps-deploy@v2
-        id: deploy-to-webapp
+
+ 
+
+      - name: Sign in to Azure 
+      # Use the GitHub secret you added.
+      - uses: azure/login@v1
+        with:
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_FA9942B87CB449AB946D7BE0CE92F46C }}
+      - name: Deploy to Azure Web App
+      # Remove publish-profile.
+      - uses: azure/webapps-deploy@v2
         with:
           app-name: 'FakeNewsDetectorServiceApp'
-          slot-name: 'Production'
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_FA9942B87CB449AB946D7BE0CE92F46C }}
+          slot-name: 'production'
+          package: .
+      - name: Sign out of Azure.
+        run: |
+          az logout
